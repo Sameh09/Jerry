@@ -1,0 +1,303 @@
+<title>Descent Protocol</title>
+<style>
+  :root{
+    --void:#15110f;
+    --steel-900:#1f1815;
+    --steel-800:#2a211c;
+    --steel-line:#4a3a30;
+    --amber:#eaa863;
+    --amber-dim:#8a5f36;
+    --caution:#d8b418;
+    --text-hi:#f8f1ea;
+    --text-mid:#c7b5a9;
+    --text-dim:#8c7868;
+    --outside-1:#ffeac0;
+    --outside-2:#ffb866;
+    --outside-3:#ff8e49;
+    --heart:#e2607a;
+    --font-body: -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Mono", "Consolas", "SFMono-Regular", monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;}
+  body{
+    background:var(--void);
+    color:var(--text-hi);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  ::selection{background:var(--amber-dim);color:var(--text-hi);}
+  button:focus-visible, [tabindex]:focus-visible{outline:2px solid var(--amber); outline-offset:3px;}
+
+  .book{position:fixed; inset:0; overflow:hidden; touch-action:pan-y; overscroll-behavior:none;}
+
+  .track{
+    display:flex; height:100%;
+    transition:transform .5s cubic-bezier(.3,.7,.3,1);
+    will-change:transform;
+  }
+  @media (prefers-reduced-motion: reduce){ .track{transition:none;} }
+
+  .page{
+    flex:0 0 100%; width:100%; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:5rem clamp(1.5rem,7vw,4rem); text-align:center;
+    background:radial-gradient(circle at 50% 38%, var(--steel-800), var(--steel-900) 72%);
+  }
+
+  .page-01{background:radial-gradient(circle at 50% 30%, var(--steel-800), var(--void) 75%);}
+
+  .heart-mini{
+    position:relative; width:11px; height:11px; transform:rotate(-45deg);
+    background:var(--heart); margin:0 auto 1rem; opacity:.85;
+  }
+  .heart-mini::before, .heart-mini::after{content:""; position:absolute; width:11px; height:11px; border-radius:50%; background:var(--heart);}
+  .heart-mini::before{top:-5.5px; left:0;}
+  .heart-mini::after{left:5.5px; top:0;}
+
+  /* cover */
+  .eyebrow{font-family:var(--font-mono); letter-spacing:.26em; font-size:.72rem; color:var(--text-dim); text-transform:uppercase; margin:0 0 1rem;}
+  .title{font-weight:800; text-transform:uppercase; font-size:clamp(2.4rem,9vw,4.8rem); letter-spacing:.01em; margin:0; line-height:1.05; color:var(--text-hi);}
+  .cover-sub{color:var(--text-mid); font-size:clamp(1.05rem,2vw,1.2rem); max-width:30ch; margin:1.1rem auto 0; line-height:1.6;}
+  .start-hint{margin-top:2.5rem; font-family:var(--font-mono); font-size:.7rem; letter-spacing:.18em; color:var(--text-dim);}
+
+  /* message pages */
+  .lvl{font-family:var(--font-mono); color:var(--amber); font-weight:700; letter-spacing:.12em; font-size:.74rem; text-transform:uppercase; margin:0 0 1.6rem;}
+  .msg{font-size:clamp(1.5rem,3.6vw,2.1rem); line-height:1.5; color:var(--text-hi); max-width:28ch; margin:0; font-weight:500;}
+  .msg strong{color:var(--amber); font-weight:700;}
+
+  /* reveal page */
+  .page-last{background:radial-gradient(circle at 50% 24%, var(--outside-1), var(--outside-2) 48%, var(--outside-3) 100%);}
+  .heartwrap{width:56px; height:56px; margin:0 0 1.1rem;}
+  @media (prefers-reduced-motion: no-preference){ .heartwrap{animation:beat 1.8s ease-in-out infinite;} }
+  @keyframes beat{0%,100%{transform:scale(1);}25%{transform:scale(1.12);}40%{transform:scale(.98);}}
+  .heart{position:relative; width:56px; height:56px; transform:rotate(-45deg); background:var(--heart); margin:14px auto 0;}
+  .heart::before, .heart::after{content:""; position:absolute; width:56px; height:56px; border-radius:50%; background:var(--heart);}
+  .heart::before{top:-28px; left:0;}
+  .heart::after{left:28px; top:0;}
+
+  .reveal-title{font-weight:800; text-transform:uppercase; font-size:clamp(2.1rem,7.5vw,3.6rem); color:#2a1403; margin:0 0 1.1rem; line-height:1.08;}
+  .note{
+    font-size:clamp(1.05rem,2vw,1.2rem); line-height:1.75; color:#3a1f08; max-width:34ch; margin:0 auto;
+    background:#ffffff48; border:1px solid #ffffff60; border-radius:14px; padding:1.3rem 1.5rem;
+  }
+  .sign{margin-top:1rem; font-family:var(--font-mono); font-size:.76rem; letter-spacing:.14em; color:#6b3f12; text-transform:uppercase;}
+
+  /* chrome: arrows, dots, progress */
+  .nav-btn{
+    position:fixed; top:50%; transform:translateY(-50%); z-index:10;
+    width:46px; height:46px; border-radius:50%; border:1px solid var(--steel-line);
+    background:#00000055; color:var(--text-mid); font-size:1.1rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .nav-btn:hover{color:var(--text-hi); border-color:var(--amber-dim);}
+  .nav-btn:disabled{opacity:.25; cursor:default;}
+  .nav-btn.prev{left:clamp(.6rem,2vw,2rem);}
+  .nav-btn.next{right:clamp(.6rem,2vw,2rem);}
+
+  .progress{
+    position:fixed; top:1.2rem; left:50%; transform:translateX(-50%); z-index:10;
+    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; color:var(--text-dim);
+  }
+
+  .dots{
+    position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); z-index:10;
+    display:flex; gap:.5rem;
+  }
+  .dot{width:9px; height:9px; transform:rotate(-45deg); background:transparent; border:1.4px solid var(--text-dim); position:relative; cursor:pointer;}
+  .dot::before, .dot::after{content:""; position:absolute; width:9px; height:9px; border-radius:50%; border:1.4px solid var(--text-dim);}
+  .dot::before{top:-4.5px; left:0;}
+  .dot::after{left:4.5px; top:0;}
+  .dot.on, .dot.on::before, .dot.on::after{border-color:var(--amber); background:var(--amber);}
+
+  .sound-btn{
+    position:fixed; top:1.2rem; left:1.2rem; z-index:10;
+    width:40px; height:40px; border-radius:50%; border:1px solid var(--steel-line);
+    background:#00000055; color:var(--text-mid); font-size:1rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .sound-btn:hover{color:var(--text-hi); border-color:var(--amber-dim);}
+  .sound-btn[aria-pressed="true"]{color:var(--amber); border-color:var(--amber-dim);}
+</style>
+
+<audio id="theme-audio" src="theme.mp3" loop preload="auto"></audio>
+<button class="sound-btn" id="btn-sound" aria-label="Toggle music" aria-pressed="false">&#9834;</button>
+
+<div class="progress" id="progress">1 / 11</div>
+
+<div class="book" id="book">
+<div class="track" id="track">
+
+  <section class="page page-01" data-page="0">
+    <h1 class="title">Hello<br />Nada</h1>
+    <p class="cover-sub">I'm Sameh, your stalker.</p>
+    <p class="start-hint">CLICK ARROW RIGHT TO SWIPE FOR REST OF CONTENT OR I WILL CUT UR FINGERS</p>
+  </section>
+
+  <section class="page" data-page="1">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 152 &mdash; Birthday Wish</p>
+    <p class="msg">I wish you a happy birthday, sweetie. I'm really happy to get the chance to celebrate this day with you, and I really wish I <strong>made you feel happy</strong>.</p>
+  </section>
+
+  <section class="page" data-page="2">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 142 &mdash; Someday</p>
+    <p class="msg">I hope next year you celebrate this day in <strong>your own villa</strong>, with your own dog, and your own studio.</p>
+  </section>
+
+  <section class="page" data-page="3">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 132 &mdash; First Contact</p>
+    <p class="msg">I know you felt surprised and confused the first time I told you how I felt about you &mdash; you thought I was rushing it. You were right. Sorry for not taking that into consideration. You just don't know some details, and I'll <strong>never tell you about them</strong> :p</p>
+  </section>
+
+  <section class="page" data-page="2">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 112 &mdash; Apology</p>
+    <p class="msg">I'm sorry for pushing you so hard about us. I take it <strong>all back</strong>.</p>
+  </section>
+
+  <section class="page" data-page="3">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 092 &mdash; Mechanical</p>
+    <p class="msg">Since I knew you, you blew the dust off an old version of me &mdash; the one I thought was <strong>never coming back</strong>.</p>
+  </section>
+
+  <section class="page" data-page="4">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 072 &mdash; Confession</p>
+    <p class="msg">I'll admit it &mdash; I wasn't being serious at first. Then you fucking charmed me, you little piece of sweet.</p>
+  </section>
+
+  <section class="page" data-page="5">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 052 &mdash; Dreams</p>
+    <p class="msg">I wish you everything you're <strong>dreaming of</strong> &mdash; a life full of achievements, and all the happiness that comes with it.</p>
+  </section>
+
+  <section class="page" data-page="6">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 032 &mdash; Kind Heart</p>
+    <p class="msg">You're a kind person, with a <strong>kind heart</strong> </p>
+  </section>
+
+  <section class="page" data-page="7">
+    <span class="heart-mini" aria-hidden="true"></span>
+    <p class="lvl">Level 012 &mdash; Peace</p>
+    <p class="msg">I hope you <strong>reach peace</strong> &mdash; whatever that looks like for you.</p>
+  </section>
+
+  <section class="page page-last" data-page="9">
+    <div class="heartwrap"><div class="heart" aria-hidden="true"></div></div>
+    <br>
+    <h1 class="reveal-title">Happy Birthday<br />My Sweetest Nada</h1>
+  </section>
+
+</div>
+</div>
+
+<button class="nav-btn prev" id="btn-prev" aria-label="Previous page">&lsaquo;</button>
+<button class="nav-btn next" id="btn-next" aria-label="Next page">&rsaquo;</button>
+<div class="dots" id="dots"></div>
+
+<script>
+  (function(){
+    var pages = Array.prototype.slice.call(document.querySelectorAll(".page"));
+    var total = pages.length;
+    var index = 0;
+
+    var track = document.getElementById("track");
+    var progress = document.getElementById("progress");
+    var audio = document.getElementById("theme-audio");
+    var soundBtn = document.getElementById("btn-sound");
+    var mutedByUser = false;
+
+    function tryPlay(){
+      if (mutedByUser) return;
+      audio.play().catch(function(){});
+    }
+    tryPlay();
+
+    soundBtn.addEventListener("click", function(){
+      if (audio.paused){
+        mutedByUser = false;
+        audio.play().catch(function(){});
+        soundBtn.setAttribute("aria-pressed", "false");
+      } else {
+        mutedByUser = true;
+        audio.pause();
+        soundBtn.setAttribute("aria-pressed", "true");
+      }
+    });
+    var btnPrev = document.getElementById("btn-prev");
+    var btnNext = document.getElementById("btn-next");
+    var dotsWrap = document.getElementById("dots");
+
+    pages.forEach(function(_, i){
+      var d = document.createElement("span");
+      d.className = "dot";
+      d.setAttribute("role", "button");
+      d.setAttribute("tabindex", "0");
+      d.setAttribute("aria-label", "Go to page " + (i + 1));
+      d.addEventListener("click", function(){ goTo(i); });
+      d.addEventListener("keydown", function(ev){
+        if (ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); goTo(i); }
+      });
+      dotsWrap.appendChild(d);
+    });
+    var dots = Array.prototype.slice.call(dotsWrap.children);
+
+    function render(){
+      track.style.transform = "translateX(-" + (index * 100) + "%)";
+      dots.forEach(function(d, i){ d.classList.toggle("on", i === index); });
+      progress.textContent = (index + 1) + " / " + total;
+      btnPrev.disabled = index === 0;
+      btnNext.disabled = index === total - 1;
+    }
+
+    var isAnimating = false;
+    track.addEventListener("transitionend", function(ev){
+      if (ev.propertyName === "transform") isAnimating = false;
+    });
+
+    function goTo(i){
+      if (isAnimating) return;
+      var next = Math.max(0, Math.min(total - 1, i));
+      if (next === index) return;
+      index = next;
+      isAnimating = true;
+      render();
+      tryPlay();
+      setTimeout(function(){ isAnimating = false; }, 600);
+    }
+
+    btnPrev.addEventListener("click", function(){ goTo(index - 1); });
+    btnNext.addEventListener("click", function(){ goTo(index + 1); });
+
+    document.addEventListener("keydown", function(ev){
+      if (ev.key === "ArrowRight") goTo(index + 1);
+      if (ev.key === "ArrowLeft") goTo(index - 1);
+    });
+
+    var touchStartX = null;
+    document.addEventListener("touchstart", function(ev){
+      touchStartX = ev.touches[0].clientX;
+    }, { passive: true });
+    document.addEventListener("touchend", function(ev){
+      if (touchStartX === null) return;
+      var dx = ev.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50){
+        if (dx < 0) goTo(index + 1);
+        else goTo(index - 1);
+      }
+      touchStartX = null;
+    });
+
+    render();
+  })();
+</script>
+
+<!-- aSByZWFsbHkgbG92ZWQgeW91IHNvIG11Y2ggLCBhbmQgaSB3aXNoIGlmIGl0IHdvcmtlZCBhcyBpIGRyZWFtZWQgb2Y= -->
