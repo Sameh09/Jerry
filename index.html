@@ -1,41 +1,46 @@
-<title>Descent Protocol</title>
+<title>Darling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --void:#15110f;
-    --steel-900:#1f1815;
-    --steel-800:#2a211c;
-    --steel-line:#4a3a30;
-    --amber:#eaa863;
-    --amber-dim:#8a5f36;
-    --caution:#d8b418;
-    --text-hi:#f8f1ea;
-    --text-mid:#c7b5a9;
-    --text-dim:#8c7868;
-    --outside-1:#ffeac0;
-    --outside-2:#ffb866;
-    --outside-3:#ff8e49;
-    --heart:#e2607a;
-    --font-body: -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-mono: ui-monospace, "Cascadia Mono", "Consolas", "SFMono-Regular", monospace;
+    --space:#020306;
+    --space-2:#070a10;
+    --line:#2a3240;
+    --ice:#9fb7c9;
+    --ice-dim:#56677a;
+    --gold:#f0b46a;
+    --gold-hi:#ffe2b0;
+    --text-hi:#eef2f6;
+    --text-mid:#aab5c0;
+    --text-dim:#6c7783;
+    --font-body: "Montserrat", -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Space Mono", ui-monospace, "Cascadia Mono", "Consolas", monospace;
   }
 
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;}
   body{
-    background:var(--void);
+    background:var(--space);
     color:var(--text-hi);
     font-family:var(--font-body);
+    font-weight:300;
     -webkit-font-smoothing:antialiased;
   }
 
-  ::selection{background:var(--amber-dim);color:var(--text-hi);}
-  button:focus-visible, [tabindex]:focus-visible{outline:2px solid var(--amber); outline-offset:3px;}
+  ::selection{background:var(--ice-dim);color:var(--text-hi);}
+  button:focus-visible, [tabindex]:focus-visible{outline:1px solid var(--ice); outline-offset:4px;}
 
-  .book{position:fixed; inset:0; overflow:hidden; touch-action:pan-y; overscroll-behavior:none;}
+  /* starfield */
+  #stars{position:fixed; inset:0; width:100%; height:100%; z-index:0; display:block;}
+  .vignette{position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 50%, transparent 40%, #000000aa 100%);}
+
+  .book{position:fixed; inset:0; overflow:hidden; touch-action:pan-y; overscroll-behavior:none; z-index:2;}
 
   .track{
     display:flex; height:100%;
-    transition:transform .5s cubic-bezier(.3,.7,.3,1);
+    transition:transform .9s cubic-bezier(.6,0,.2,1);
     will-change:transform;
   }
   @media (prefers-reduced-motion: reduce){ .track{transition:none;} }
@@ -44,156 +49,177 @@
     flex:0 0 100%; width:100%; height:100%;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:5rem clamp(1.5rem,7vw,4rem); text-align:center;
-    background:radial-gradient(circle at 50% 38%, var(--steel-800), var(--steel-900) 72%);
+    background:transparent;
   }
 
-  .page-01{background:radial-gradient(circle at 50% 30%, var(--steel-800), var(--void) 75%);}
+  /* cover: planet horizon glowing at the bottom */
+  .page-01{background:radial-gradient(ellipse 90% 40% at 50% 115%, #7fa6c955, #1b2a3a33 45%, transparent 70%);}
 
-  .heart-mini{
-    position:relative; width:11px; height:11px; transform:rotate(-45deg);
-    background:var(--heart); margin:0 auto 1rem; opacity:.85;
+  .star-mini{
+    width:14px; height:14px; margin:0 auto 1.2rem; background:var(--ice);
+    clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%);
+    opacity:.9;
   }
-  .heart-mini::before, .heart-mini::after{content:""; position:absolute; width:11px; height:11px; border-radius:50%; background:var(--heart);}
-  .heart-mini::before{top:-5.5px; left:0;}
-  .heart-mini::after{left:5.5px; top:0;}
 
   /* cover */
-  .eyebrow{font-family:var(--font-mono); letter-spacing:.26em; font-size:.72rem; color:var(--text-dim); text-transform:uppercase; margin:0 0 1rem;}
-  .title{font-weight:800; text-transform:uppercase; font-size:clamp(2.4rem,9vw,4.8rem); letter-spacing:.01em; margin:0; line-height:1.05; color:var(--text-hi);}
-  .cover-sub{color:var(--text-mid); font-size:clamp(1.05rem,2vw,1.2rem); max-width:30ch; margin:1.1rem auto 0; line-height:1.6;}
-  .start-hint{margin-top:2.5rem; font-family:var(--font-mono); font-size:.7rem; letter-spacing:.18em; color:var(--text-dim);}
+  .eyebrow{font-family:var(--font-mono); letter-spacing:.32em; font-size:.68rem; color:var(--ice); text-transform:uppercase; margin:0 0 1.4rem;}
+  .title{font-weight:200; text-transform:uppercase; font-size:clamp(2.4rem,9vw,5rem); letter-spacing:.38em; margin:0 0 0 .38em; line-height:1.2; color:var(--text-hi);}
+  .cover-sub{color:var(--text-mid); font-size:clamp(1rem,2vw,1.15rem); max-width:30ch; margin:1.4rem auto 0; line-height:1.6; letter-spacing:.04em;}
+  .start-hint{margin-top:2.8rem; font-family:var(--font-mono); font-size:.64rem; letter-spacing:.2em; color:var(--text-dim); max-width:46ch; line-height:1.8;}
 
   /* message pages */
-  .lvl{font-family:var(--font-mono); color:var(--amber); font-weight:700; letter-spacing:.12em; font-size:.74rem; text-transform:uppercase; margin:0 0 1.6rem;}
-  .msg{font-size:clamp(1.5rem,3.6vw,2.1rem); line-height:1.5; color:var(--text-hi); max-width:28ch; margin:0; font-weight:500;}
-  .msg strong{color:var(--amber); font-weight:700;}
+  .lvl{font-family:var(--font-mono); color:var(--ice); letter-spacing:.24em; font-size:.7rem; text-transform:uppercase; margin:0 0 1.8rem;}
+  .msg{font-size:clamp(1.4rem,3.4vw,2rem); line-height:1.6; color:var(--text-hi); max-width:28ch; margin:0; font-weight:300;}
+  .msg strong{color:var(--gold); font-weight:500; text-shadow:0 0 18px #f0b46a40;}
 
-  /* reveal page */
-  .page-last{background:radial-gradient(circle at 50% 24%, var(--outside-1), var(--outside-2) 48%, var(--outside-3) 100%);}
-  .heartwrap{width:56px; height:56px; margin:0 0 1.1rem;}
-  @media (prefers-reduced-motion: no-preference){ .heartwrap{animation:beat 1.8s ease-in-out infinite;} }
-  @keyframes beat{0%,100%{transform:scale(1);}25%{transform:scale(1.12);}40%{transform:scale(.98);}}
-  .heart{position:relative; width:56px; height:56px; transform:rotate(-45deg); background:var(--heart); margin:14px auto 0;}
-  .heart::before, .heart::after{content:""; position:absolute; width:56px; height:56px; border-radius:50%; background:var(--heart);}
-  .heart::before{top:-28px; left:0;}
-  .heart::after{left:28px; top:0;}
-
-  .reveal-title{font-weight:800; text-transform:uppercase; font-size:clamp(2.1rem,7.5vw,3.6rem); color:#2a1403; margin:0 0 1.1rem; line-height:1.08;}
-  .note{
-    font-size:clamp(1.05rem,2vw,1.2rem); line-height:1.75; color:#3a1f08; max-width:34ch; margin:0 auto;
-    background:#ffffff48; border:1px solid #ffffff60; border-radius:14px; padding:1.3rem 1.5rem;
+  /* reveal page: Gargantua */
+  .page-last{background:radial-gradient(ellipse 70% 50% at 50% 38%, #f0a05014, transparent 70%);}
+  .bh{
+    --s:min(26vw,118px);
+    position:relative; width:calc(var(--s) * 3.4); height:calc(var(--s) * 1.7);
+    margin:0 0 1.8rem;
   }
-  .sign{margin-top:1rem; font-family:var(--font-mono); font-size:.76rem; letter-spacing:.14em; color:#6b3f12; text-transform:uppercase;}
+  .bh > div{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); border-radius:50%;}
+  .bh-halo{
+    z-index:1; width:calc(var(--s) * 1.55); height:calc(var(--s) * 1.55);
+    background:radial-gradient(circle, transparent 0 44%, #fff1d2 47%, #f6b462 51%, #c0662455 60%, transparent 70%);
+  }
+  .bh-disk, .bh-front{
+    width:calc(var(--s) * 3.4); height:calc(var(--s) * .32);
+    background:radial-gradient(ellipse at center, #fff6e0 0%, #ffd08a 22%, #e8913f 42%, #8a3e1255 62%, transparent 72%);
+  }
+  .bh-disk{z-index:2;}
+  .bh-core{z-index:3; width:var(--s); height:var(--s); background:#000; box-shadow:0 0 24px 4px #000;}
+  .bh-front{z-index:4; clip-path:inset(50% 0 0 0);}
+  @media (prefers-reduced-motion: no-preference){
+    .bh-halo, .bh-disk, .bh-front{animation:shimmer 5s ease-in-out infinite;}
+  }
+  @keyframes shimmer{0%,100%{filter:brightness(1);}50%{filter:brightness(1.25);}}
 
-  /* chrome: arrows, dots, progress */
+  .reveal-title{
+    font-weight:200; text-transform:uppercase; letter-spacing:.24em; margin:0 0 1.4rem .24em;
+    font-size:clamp(1.7rem,6vw,3.1rem); line-height:1.35; color:var(--gold-hi);
+    text-shadow:0 0 30px #f0b46a55;
+  }
+  .quote{font-size:clamp(.95rem,1.8vw,1.05rem); line-height:1.75; color:var(--text-mid); max-width:36ch; margin:0 auto; font-style:italic;}
+  .sign{margin-top:1.2rem; font-family:var(--font-mono); font-size:.66rem; letter-spacing:.22em; color:var(--text-dim); text-transform:uppercase;}
+
+  /* chrome: TARS-style arrows, dots, progress */
   .nav-btn{
     position:fixed; top:50%; transform:translateY(-50%); z-index:10;
-    width:46px; height:46px; border-radius:50%; border:1px solid var(--steel-line);
-    background:#00000055; color:var(--text-mid); font-size:1.1rem; cursor:pointer;
+    width:30px; height:72px; border-radius:2px; border:1px solid var(--line);
+    background:linear-gradient(180deg,#1a1f27cc,#0b0e13cc); color:var(--text-mid); font-size:1.1rem; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
   }
-  .nav-btn:hover{color:var(--text-hi); border-color:var(--amber-dim);}
-  .nav-btn:disabled{opacity:.25; cursor:default;}
+  .nav-btn:hover{color:var(--text-hi); border-color:var(--ice-dim);}
+  .nav-btn:disabled{opacity:.2; cursor:default;}
   .nav-btn.prev{left:clamp(.6rem,2vw,2rem);}
   .nav-btn.next{right:clamp(.6rem,2vw,2rem);}
 
   .progress{
-    position:fixed; top:1.2rem; left:50%; transform:translateX(-50%); z-index:10;
-    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; color:var(--text-dim);
+    position:fixed; top:1.4rem; left:50%; transform:translateX(-50%); z-index:10;
+    font-family:var(--font-mono); font-size:.64rem; letter-spacing:.22em; color:var(--text-dim); white-space:nowrap;
   }
 
   .dots{
-    position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); z-index:10;
-    display:flex; gap:.5rem;
+    position:fixed; bottom:1.6rem; left:50%; transform:translateX(-50%); z-index:10;
+    display:flex; gap:.7rem; align-items:center;
   }
-  .dot{width:9px; height:9px; transform:rotate(-45deg); background:transparent; border:1.4px solid var(--text-dim); position:relative; cursor:pointer;}
-  .dot::before, .dot::after{content:""; position:absolute; width:9px; height:9px; border-radius:50%; border:1.4px solid var(--text-dim);}
-  .dot::before{top:-4.5px; left:0;}
-  .dot::after{left:4.5px; top:0;}
-  .dot.on, .dot.on::before, .dot.on::after{border-color:var(--amber); background:var(--amber);}
+  .dot{width:5px; height:5px; border-radius:50%; background:var(--text-dim); cursor:pointer; transition:transform .3s, background .3s, box-shadow .3s;}
+  .dot.on{background:var(--gold); transform:scale(1.6); box-shadow:0 0 8px var(--gold);}
 
   .sound-btn{
-    position:fixed; top:1.2rem; left:1.2rem; z-index:10;
-    width:40px; height:40px; border-radius:50%; border:1px solid var(--steel-line);
-    background:#00000055; color:var(--text-mid); font-size:1rem; cursor:pointer;
+    position:fixed; top:1rem; left:1rem; z-index:10;
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--line);
+    background:#0b0e13cc; color:var(--text-mid); font-size:.95rem; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
   }
-  .sound-btn:hover{color:var(--text-hi); border-color:var(--amber-dim);}
-  .sound-btn[aria-pressed="true"]{color:var(--amber); border-color:var(--amber-dim);}
+  .sound-btn:hover{color:var(--text-hi); border-color:var(--ice-dim);}
+  .sound-btn[aria-pressed="true"]{color:var(--text-dim);}
 </style>
 
-<audio id="theme-audio" src="theme.mp3" loop preload="auto"></audio>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<audio id="theme-audio" src="Hazy%20-%20World.mp3" loop preload="auto"></audio>
 <button class="sound-btn" id="btn-sound" aria-label="Toggle music" aria-pressed="false">&#9834;</button>
 
-<div class="progress" id="progress">1 / 11</div>
+<div class="progress" id="progress"></div>
 
 <div class="book" id="book">
 <div class="track" id="track">
 
-  <section class="page page-01" data-page="0">
+  <section class="page page-01">
+    <p class="eyebrow">Endurance &middot; Mission Log</p>
     <h1 class="title">Hello<br />Nada</h1>
-    <p class="cover-sub">I'm Sameh, your stalker.</p>
-    <p class="start-hint">CLICK ARROW RIGHT TO SWIPE FOR REST OF CONTENT OR I WILL CUT UR FINGERS</p>
+    <p class="cover-sub">I'm your stalker.</p>
+    <p class="start-hint">CLICK THE RIGHT ARROW OR SWIPE TO SEE THE REST, OR I WILL CUT UR FINGERS</p>
   </section>
 
-  <section class="page" data-page="1">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 152 &mdash; Birthday Wish</p>
-    <p class="msg">I wish you a happy birthday, sweetie. I'm really happy to get the chance to celebrate this day with you, and I really wish I <strong>made you feel happy</strong>.</p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 01 &mdash; Launch</p>
+    <p class="msg">I wish you a happy birthday, sweetie. I'm really happy to get the chance to celebrate this day with you, and I really hope I <strong>made you feel happy</strong>.</p>
   </section>
 
-  <section class="page" data-page="2">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 142 &mdash; Someday</p>
-    <p class="msg">I hope next year you celebrate this day in <strong>your own villa</strong>, with your own dog, and your own studio.</p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 02 &mdash; New Worlds</p>
+    <p class="msg">I hope next year you celebrate this day in <strong>your own studio</strong> &mdash; the dream you're chasing &mdash; and then go home to your own villa, with your own dog waiting for you.</p>
   </section>
 
-  <section class="page" data-page="3">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 132 &mdash; First Contact</p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 03 &mdash; First Contact</p>
     <p class="msg">I know you felt surprised and confused the first time I told you how I felt about you &mdash; you thought I was rushing it. You were right. Sorry for not taking that into consideration. You just don't know some details, and I'll <strong>never tell you about them</strong> :p</p>
   </section>
 
-  <section class="page" data-page="2">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 112 &mdash; Apology</p>
-    <p class="msg">I'm sorry for pushing you so hard about us. I take it <strong>all back</strong>.</p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 04 &mdash; Dust</p>
+    <p class="msg">Since I met you, you blew the dust off an old version of me &mdash; the one I thought was <strong>never coming back</strong>.</p>
   </section>
 
-  <section class="page" data-page="3">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 092 &mdash; Mechanical</p>
-    <p class="msg">Since I knew you, you blew the dust off an old version of me &mdash; the one I thought was <strong>never coming back</strong>.</p>
-  </section>
-
-  <section class="page" data-page="4">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 072 &mdash; Confession</p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 05 &mdash; Gravity</p>
     <p class="msg">I'll admit it &mdash; I wasn't being serious at first. Then you fucking charmed me, you little piece of sweet.</p>
   </section>
 
-  <section class="page" data-page="5">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 052 &mdash; Dreams</p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 06 &mdash; Plan A</p>
     <p class="msg">I wish you everything you're <strong>dreaming of</strong> &mdash; a life full of achievements, and all the happiness that comes with it.</p>
   </section>
 
-  <section class="page" data-page="6">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 032 &mdash; Kind Heart</p>
-    <p class="msg">You're a kind person, with a <strong>kind heart</strong> </p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 07 &mdash; Brightest Star</p>
+    <p class="msg">You're the kindest person, with the <strong>kindest heart</strong>. And you're the best Nada &mdash; for real, <strong>the best ever</strong>.</p>
   </section>
 
-  <section class="page" data-page="7">
-    <span class="heart-mini" aria-hidden="true"></span>
-    <p class="lvl">Level 012 &mdash; Peace</p>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 08 &mdash; Quiet Orbit</p>
     <p class="msg">I hope you <strong>reach peace</strong> &mdash; whatever that looks like for you.</p>
   </section>
 
-  <section class="page page-last" data-page="9">
-    <div class="heartwrap"><div class="heart" aria-hidden="true"></div></div>
-    <br>
+  <section class="page">
+    <span class="star-mini" aria-hidden="true"></span>
+    <p class="lvl">Log 09 &mdash; Tesseract</p>
+    <p class="msg">Just remember, <strong>I want you in my life</strong> &mdash; and I want full access to you, all of you.</p>
+  </section>
+
+  <section class="page page-last">
+    <div class="bh" aria-hidden="true">
+      <div class="bh-halo"></div>
+      <div class="bh-disk"></div>
+      <div class="bh-core"></div>
+      <div class="bh-front"></div>
+    </div>
     <h1 class="reveal-title">Happy Birthday<br />My Sweetest Nada</h1>
+    <p class="quote">Another trip around the sun &mdash; and I'm lucky to be in your orbit.</p>
+    <p class="sign">End of transmission</p>
   </section>
 
 </div>
@@ -211,17 +237,28 @@
 
     var track = document.getElementById("track");
     var progress = document.getElementById("progress");
-    var audio = document.getElementById("theme-audio");
     var soundBtn = document.getElementById("btn-sound");
     var mutedByUser = false;
 
+    var audio = document.getElementById("theme-audio");
+
     function tryPlay(){
-      if (mutedByUser) return;
+      if (mutedByUser || !audio.paused) return;
       audio.play().catch(function(){});
     }
     tryPlay();
 
-    soundBtn.addEventListener("click", function(){
+    // browsers block sound until the first interaction, so start on the first tap/key
+    ["pointerdown", "keydown", "touchend"].forEach(function(type){
+      document.addEventListener(type, function onFirst(ev){
+        if (soundBtn.contains(ev.target)) return; // the sound button handles itself
+        document.removeEventListener(type, onFirst);
+        tryPlay();
+      });
+    });
+
+    soundBtn.addEventListener("click", function(ev){
+      ev.stopPropagation();
       if (audio.paused){
         mutedByUser = false;
         audio.play().catch(function(){});
@@ -250,10 +287,12 @@
     });
     var dots = Array.prototype.slice.call(dotsWrap.children);
 
+    function pad(n){ return (n < 10 ? "0" : "") + n; }
+
     function render(){
       track.style.transform = "translateX(-" + (index * 100) + "%)";
       dots.forEach(function(d, i){ d.classList.toggle("on", i === index); });
-      progress.textContent = (index + 1) + " / " + total;
+      progress.textContent = "TRANSMISSION " + pad(index + 1) + " / " + pad(total);
       btnPrev.disabled = index === 0;
       btnNext.disabled = index === total - 1;
     }
@@ -271,7 +310,7 @@
       isAnimating = true;
       render();
       tryPlay();
-      setTimeout(function(){ isAnimating = false; }, 600);
+      setTimeout(function(){ isAnimating = false; }, 1000);
     }
 
     btnPrev.addEventListener("click", function(){ goTo(index - 1); });
@@ -295,6 +334,68 @@
       }
       touchStartX = null;
     });
+
+    // starfield: twinkling stars that drift with parallax as pages change
+    var canvas = document.getElementById("stars");
+    var ctx = canvas.getContext("2d");
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var stars = [];
+    var W = 0, H = 0, spread = 0;
+    var shift = 0;
+    var drift = 0;
+    var lastT = null;
+    var DRIFT_SPEED = 14; // px per second for the nearest stars
+
+    function makeStars(){
+      var dpr = window.devicePixelRatio || 1;
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.round(W * H / 2600);
+      spread = W * (1 + total * 0.12);
+      stars = [];
+      for (var i = 0; i < count * (1 + total * 0.12); i++){
+        var depth = Math.random();
+        stars.push({
+          x: Math.random() * spread,
+          y: Math.random() * H,
+          r: 0.3 + depth * 1.2,
+          a: 0.25 + depth * 0.75,
+          depth: depth,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.5 + Math.random() * 1.5,
+          warm: Math.random() < 0.12
+        });
+      }
+    }
+
+    function draw(t){
+      var target = index * W * 0.12;
+      shift += reduceMotion ? (target - shift) : (target - shift) * 0.04;
+      var dt = lastT === null ? 0 : Math.min(t - lastT, 100) / 1000;
+      lastT = t;
+      if (!reduceMotion) drift += DRIFT_SPEED * dt;
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < stars.length; i++){
+        var s = stars[i];
+        var f = 0.3 + s.depth * 0.7;
+        var x = (s.x - (shift + drift) * f) % spread;
+        if (x < 0) x += spread;
+        if (x < -2 || x > W + 2) continue;
+        var tw = reduceMotion ? 1 : 0.65 + 0.35 * Math.sin(t / 1000 * s.speed + s.phase);
+        ctx.globalAlpha = s.a * tw;
+        ctx.fillStyle = s.warm ? "#ffe2b0" : "#dfe9f3";
+        ctx.beginPath();
+        ctx.arc(x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    }
+
+    makeStars();
+    window.addEventListener("resize", makeStars);
+    requestAnimationFrame(draw);
 
     render();
   })();
